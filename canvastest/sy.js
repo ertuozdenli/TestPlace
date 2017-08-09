@@ -17,6 +17,12 @@ function kareciz(x,y,w,h){
   c.fillStyle = "#1a1a1a";
   c.fill();
 }
+var sag=false,sol=false,yuk=false,asa=false;
+
+function sifirla(){
+   sag=false,sol=false,yuk=false,asa=false;
+}
+
 var x,y,w,h;
 x=(Math.random()*canvas.width)+1;
 y=(Math.random()*canvas.height)+1;
@@ -27,25 +33,25 @@ h=(Math.random()*100)+10;
 w=100;
 h=100;
 var hiz=3;
-var sag=false,sol=false,yuk=false,asa=false;
 asa=true;
+
 document.addEventListener("keydown",function(event){
   console.log(event.keyCode);
 
   if (event.keyCode==37) {
-    sag=false,sol=false,yuk=false,asa=false;
+    sifirla();
     sol=true;
   }
   if (event.keyCode==38) {
-    sag=false,sol=false,yuk=false,asa=false;
+    sifirla();
     yuk=true;
   }
   if (event.keyCode==39) {
-    sag=false,sol=false,yuk=false,asa=false;
+    sifirla();
     sag=true;
   }
   if (event.keyCode==40) {
-    sag=false,sol=false,yuk=false,asa=false;
+    sifirla();
     asa=true;
   }
 
@@ -105,21 +111,3 @@ function animation(){
 }
 
 animation();
-
-// var hareket=false;
-// document.addEventListener("mousedown", function(event) {
-//     hareket = true;
-// });
-//
-// document.addEventListener("mouseup",function(event){
-//   hareket = false;
-// });
-//
-// document.addEventListener("mousemove", function(event) {
-//     if (hareket) {
-//       c.beginPath();
-//       c.rect(event.clientX - 50,event.clientY - 50,100,100);
-//       c.fillStyle = "#1a1a1a";
-//       c.fill();
-//     }
-// });
