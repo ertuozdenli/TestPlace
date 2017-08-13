@@ -125,7 +125,6 @@ class Censan
     public function getCatId($cat)
     {
         $db = $this->connect();
-        // $catId = $db->query('SELECT category_id FROM ' . DB_PREFIX . 'category_description WHERE `name` = "'.$cat.'"')->fetch(PDO::FETCH_ASSOC);
         $catId = $db->prepare('SELECT category_id FROM ' . DB_PREFIX . 'category_description WHERE `name` = :katad');
         $catId->bindParam(':katad', $cat);
         $catId->execute();
@@ -146,7 +145,7 @@ class Censan
         return $adet;
     }
 
-    public function productAddandUpdate($products=[], $catId)
+    public function productAddandUpdate($products=[], $catId, $status)
     {
         $db = $this->connect();
         $product[] = $products;
@@ -160,23 +159,32 @@ class Censan
             $result = $exists->fetch(PDO::FETCH_ASSOC);
 
             if ($result) {
-                $read = $exists->fetch(PDO::FETCH_ASSOC);
-                $productId = $read["product_id"];
+                $productId = $result["product_id"];
 
                 $adet = $this->getQuantity($product["adet"]);
                 $fiyat = floatval($product["fiyat_satis"]);
 
-                $query = $db->query('UPDATE '. DB_PREFIX .'product SET
-          `quantity` = ":adet",
-          `image` = ":photourl",
-          `price` = ":fiyat",
+                $pstatus = 1;
+
+                if ($adet==0 && $status) {
+                    $pstatus = 0;
+                }
+                $query = $db->prepare('UPDATE '. DB_PREFIX .'product SET
+          `quantity` = :adet,
+          `image` = :photourl,
+          `price` = :fiyat,
+          `status` = :status,
           `date_modified` = NOW()
-           WHERE `product_id` = "'.$productId.'"');
+           WHERE `product_id` = :pid
+        ');
 
                 $query->bindParam(":adet", $adet);
+                $query->bindParam(":pid", $productId);
                 $query->bindParam(":photourl", $product["img_large"]);
+                $query->bindParam(":status", $pstatus);
                 $query->bindParam(":fiyat", $fiyat);
                 $query->execute();
+
 
                 $query = $db->prepare(
             'UPDATE '. DB_PREFIX .'product_description SET
@@ -200,7 +208,10 @@ class Censan
             } else {
                 $adet = $this->getQuantity($product["adet"]);
                 $fiyat = doubleval($product["fiyat_satis"]);
-
+                $pstatus = 1;
+                if ($adet==0 && $status) {
+                    $pstatus = 0;
+                }
                 $query = $db->prepare('INSERT INTO '. DB_PREFIX .'product SET
           `model` = :pkodu,
           `quantity` = :adet,
@@ -213,7 +224,7 @@ class Censan
           `date_available` = NOW(),
           `minimum` = 1,
           `sort_order` = 0,
-          `status`= 1,
+          `status`= :status,
           `viewed` = 0,
           `date_added` = NOW(),
           `date_modified` = NOW()
@@ -223,6 +234,7 @@ class Censan
                 $query->bindParam(":adet", $adet);
                 $query->bindParam(":photourl", $product["img_large"]);
                 $query->bindParam(":fiyat", $fiyat);
+                $query->bindParam(":status", $pstatus);
                 $query->execute();
 
                 $productId = $db->lastInsertId();
@@ -267,7 +279,7 @@ class Censan
         return array($added,$updated);
     }
 
-    public function productChecks($catlist)
+    public function productChecks($catlist, $status)
     {
         $urunler=[];
         $db = $this->connect();
@@ -277,23 +289,50 @@ class Censan
             $catId = $this->getCatId($cat);
             if ($catId) {
                 $urunler = $this->getProduct($cat);
-                $result[$i][] = $this->productAddandUpdate($urunler, $catId);
+                $result[$i][] = $this->productAddandUpdate($urunler, $catId, $status);
                 $i++;
             }
         }
+        $disabled = $this->productNotExists();
         return $result;
     }
-}
 
-// Ürün silme işlemi için kontrol
-// $urunler=[];
-// foreach ($categories as $cat) {
-//   // echo $cat."<br>";
-//   $urunler[] = $CatsandProducts->getProduct($cat);
-// }
-//
-// foreach ($urunler as $urun => $key) {
-//   foreach ($key as $iki) {
-//     echo $iki["kodu"]."<br>";
-//   }
-// }
+    public function productNotExists()
+    {
+        $urunler=[];
+        $codelist=[];
+        $disabled=[];
+        $db = $this->connect();
+
+        foreach ($this->kategoriler as $cat) {
+            $urunler[] = $this->getProduct($cat);
+        }
+
+        foreach ($urunler as $urun => $key) {
+            foreach ($key as $code) {
+                $codelist[] = $code["kodu"];
+            }
+        }
+
+        $query = $db->prepare('SELECT product_id,model FROM '.DB_PREFIX.'product WHERE model LIKE :model');
+        $modelprefix = PRODUCT_PREFIX."%";
+        $query->bindParam(":model", $modelprefix);
+        $query->execute();
+
+        if ($query->rowCount()) {
+            foreach ($query as $row) {
+                $result = in_array($row["model"], $codelist);
+                if (!$result) {
+                    $query = $db->query('UPDATE '.DB_PREFIX.'product SET `status` = 0');
+                    $disabled[] = $row["model"];
+                }
+            }
+        }
+
+        if ($disabled) {
+            return $disabled;
+        }
+
+        return false;
+    }
+}

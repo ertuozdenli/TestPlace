@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Censan Product Fetch for Opencart</title>
+  <!--     Fonts and icons     -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link href="./assets/css/now-ui-kit.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .flex {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .pd0 {
+      padding: 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .hiddeno {
+      opacity: 0;
+    }
+
+    .results {
+      margin-top: 10px;
+    }
+
+    .bootstrap-switch-on {
+      background-color: #f96332;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="flex">
+    <div class="wrap col-md-4">
+
+      <div class="form-group form-group-no-border">
+        <input type="text" id="url" name="url" value="http://...path.../data.xml" placeholder="http://...path.../data.xml" class="form-control" />
+      </div>
+
+      <div class="form-group form-group-no-border">
+        <input type="password" id="pass" name="pass" placeholder="Pass" class="form-control" />
+      </div>
+
+
+      <div class="form-group text-right">
+        <label for="checkbox">
+          Stokta olmayan ürünleri devre dışı bırak.
+        </label>
+        <input type="checkbox" id="pstok" name="checkbox" class="bootstrap-switch pstok" data-on-label="ON" data-off-label="OFF" />
+      </div>
+
+      <div class="col-md-12 pd0">
+        <div class="form-group form-group-no-border text-right">
+          <button class="btn btn-primary btn-round col-md-12" type="button" onClick="fetch();">
+            Ürünleri Eşleştir
+            <i class="now-ui-icons loader_gear hiddeno spin"></i>
+        </button>
+        </div>
+      </div>
+
+      <div class="progress-container progress-primary hidden">
+        <span class="progress-badge"> İşleniyor</span>
+        <div class="progress">
+          <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width:0%;">
+            <span class="progress-value"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="results"></div>
+
+    </div>
+  </div>
+
+</body>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="./assets/js/core/tether.min.js"></script>
+<script src="./assets/js/core/bootstrap.min.js"></script>
+<script src="./assets/js/now-ui-kit.js" type="text/javascript"></script>
+<script src="./assets/js/plugins/bootstrap-switch.js" type="text/javascript"></script>
+<script>
+  function fetch() {
+    var vurl = $("#url").val();
+    var vpass = $('#pass').val();
+    var vstok = $('#pstok').is(':checked');
+
+    $.ajax({
+      url: "./fetch.php",
+      method: "GET",
+      data: {
+        url: vurl,
+        pass: vpass,
+        stok: vstok
+      },
+      beforeSend: function() {
+        $(".results").html("");
+        $('.progress-container').fadeIn();
+        $('.loader_gear').css({
+          opacity: "1"
+        });
+        $('.progress-badge').html("Eşleştirme yapılıyor...");
+        $('.progress-bar').css({
+          width: "50%"
+        });
+        $('.progress-value').html("% 50");
+        $('.btn').attr("disabled", true);
+      },
+      success: function(res) {
+        $('.progress-badge').html("Tamamlandı");
+        $('.loader_gear').css({
+          opacity: "0"
+        });
+        $('.progress-bar').css({
+          width: "100%"
+        });
+        $('.progress-value').html("% 100");
+        $(".results").html(res);
+        $('.btn').attr("disabled", false);
+      }
+
+    });
+  }
+</script>
+
+</html>
