@@ -10,24 +10,24 @@
   $catcheck = $CatsandProducts->catdbCheck($categories); // Kategoriler Kontrol Ediliyolor
 
   if (isset($catcheck["notexists"])) {
-    $result = $CatsandProducts->addCategories($catcheck["notexists"]);
-    if ($result) {
-      echo "Kategori Ekleme işlemi tamamlandı.";
-    }else{
-      echo "Kategori Ekleme işlemi sırasında hata oluştu.";
-    }
+      $result = $CatsandProducts->addCategories($catcheck["notexists"]);
+      if ($result) {
+          echo "Kategori Ekleme işlemi tamamlandı.";
+      } else {
+          echo "Kategori Ekleme işlemi sırasında hata oluştu.";
+      }
   }
 
   if (isset($catcheck["exists"])) {
-    echo "Kategoriler eşleşti";
+      echo "Kategoriler eşleşti";
   }
 
   $results = $CatsandProducts->productChecks($categories);
   $toplamg=0; $toplamd=0;
 
   foreach ($results as $result) {
-    $toplamg += $result[0][0];
-    $toplamd += $result[0][1];
+      $toplamg += $result[0][0];
+      $toplamd += $result[0][1];
   }
 
   echo "<br> <Giriş: ". $toplamg."<br>" ;
