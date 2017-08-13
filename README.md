@@ -1,3 +1,3 @@
 ### Testing Place
 
-Some tests & some usefull scripts
+Some tests & some useful scripts
