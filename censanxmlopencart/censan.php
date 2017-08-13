@@ -323,7 +323,9 @@ class Censan
             foreach ($query as $row) {
                 $result = in_array($row["model"], $codelist);
                 if (!$result) {
-                    $query = $db->query('UPDATE '.DB_PREFIX.'product SET `status` = 0');
+                    $query = $db->prepare('UPDATE '.DB_PREFIX.'product SET `status` = 0 WHERE model = :model');
+                    $query->bindParam(":model", $row["model"]);
+                    $query->execute();
                     $disabled[] = $row["model"];
                 }
             }
