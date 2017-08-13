@@ -29,8 +29,8 @@
     $toplamg += $result[0][0];
     $toplamd += $result[0][1];
   }
-  echo "<br>";
-  echo "Giriş: ". $toplamg."<br>" ;
+
+  echo "<br> <Giriş: ". $toplamg."<br>" ;
   echo "Güncelleme: ". $toplamd;
 
   ?>
