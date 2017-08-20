@@ -22,58 +22,88 @@ class yuvarlak {
     }
 }
 
+function getRandColor() {
+    var renk = "rgb(";
+    for (i = 1; i <= 3; i++) {
+        renk += parseInt(Math.random() * 255);
+        if (i < 3) {
+            renk += ",";
+        }
+    }
+    renk += ")";
+    return renk;
+}
 
-
+var clicked = false;
 
 var ortax = genislik / 2;
 var ortah = yukseklik / 2;
-var yercekimi = 0.90;
+var yercekimi = 0.85;
 // var randx = Math.random() * genislik;
 // var randy = Math.random() * yukseklik;
 var kullanicix = ortax,
     kullaniciy = ortah;
 
-    var konum = [[ortax,ortah]];
-    var hiz = [5];
-    var adet = 1;
+var konum = [
+    [ortax, ortah, getRandColor()]
+];
+var hiz = [3];
+var adet = 1;
+
 window.addEventListener("click", function (e) {
     kullanicix = e.clientX;
     kullaniciy = e.clientY;
-    
-    
-    nesne.yciz(kullanicix, kullaniciy, 50, 50);
-    konum[adet] = [kullanicix, kullaniciy];
+    var renk = getRandColor();
+    // console.log(renk);
+    nesne.yciz(kullanicix, kullaniciy, 35, 35, renk);
+    konum[adet] = [kullanicix, kullaniciy, renk];
     adet++;
-    hiz.push(5);
+    hiz.push(3);
 });
 
+window.addEventListener("mousedown", function () {
+    clicked = true;
+});
+
+// window.addEventListener("mouseup", function () {
+//     clicked = false;
+// });
+
+// window.addEventListener("mousemove",function(e){
+
+//     if(clicked){
+//         kullanicix = e.clientX;
+//         kullaniciy = e.clientY;
+//         var renk = getRandColor();
+//         // console.log(renk);
+//         nesne.yciz(kullanicix, kullaniciy, 35, 35,renk);
+//         konum[adet] = [kullanicix, kullaniciy, renk];
+//         adet++;
+//         hiz.push(3);
+//     }
+
+// });
+
 var nesne = new yuvarlak();
-
-
 
 function animate() {
     requestAnimationFrame(animate);
 
     c.clearRect(0, 0, genislik, yukseklik);
 
-    // nesne.yciz(kullanicix, kullaniciy, 50, 50);
+
     for (var i = 0; i < adet; i++) {
-        
-        nesne.yciz(konum[i][0], konum[i][1], 50, 50);
-        
-        if (konum[i][1] + 50 > yukseklik) {
+
+        nesne.yciz(konum[i][0], konum[i][1], 35, 35, konum[i][2]);
+
+        if (konum[i][1] + 35 > yukseklik) {
             hiz[i] = -hiz[i] * yercekimi;
         } else {
             hiz[i] += 1;
         }
-    
+
         konum[i][1] += hiz[i];
     }
-
-    
-   
-
-    
 
 }
 
